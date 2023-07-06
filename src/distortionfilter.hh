@@ -279,7 +279,112 @@ public:
     }
 };
 
+class OldFilmFilter {
+private:
+    std::default_random_engine rng;
 
+public:
+    OldFilmFilter() : rng(std::random_device{}()) {}
+
+    void applyFilter(cv::Mat& frame, int time) {
+        std::uniform_int_distribution<int> dist(0, 255);
+
+        // Pour chaque pixel de l'image
+        for (int y = 0; y < frame.rows; ++y) {
+            for (int x = 0; x < frame.cols; ++x) {
+                cv::Vec3b& pixel = frame.at<cv::Vec3b>(y, x);
+
+                // Convertir en sépia
+                int tr = std::min(255, static_cast<int>(0.393 * pixel[2] + 0.769 * pixel[1] + 0.189 * pixel[0]));
+                int tg = std::min(255, static_cast<int>(0.349 * pixel[2] + 0.686 * pixel[1] + 0.168 * pixel[0]));
+                int tb = std::min(255, static_cast<int>(0.272 * pixel[2] + 0.534 * pixel[1] + 0.131 * pixel[0]));
+                pixel = cv::Vec3b(tb, tg, tr);
+                
+                // Ajouter du grain
+                int noise = dist(rng) < 5 ? dist(rng) : 0;
+                pixel[0] = std::clamp(pixel[0] + noise, 0, 255);
+                pixel[1] = std::clamp(pixel[1] + noise, 0, 255);
+                pixel[2] = std::clamp(pixel[2] + noise, 0, 255);
+            }
+        }
+
+        // Vignetage
+        for (int y = 0; y < frame.rows; ++y) {
+            for (int x = 0; x < frame.cols; ++x) {
+                double dx = static_cast<double>(x - frame.cols / 2) / (frame.cols / 2);
+                double dy = static_cast<double>(y - frame.rows / 2) / (frame.rows / 2);
+                double dist = sqrt(dx * dx + dy * dy)/2;
+
+                cv::Vec3b& pixel = frame.at<cv::Vec3b>(y, x);
+                pixel[0] = pixel[0] * (1.0 - dist);
+                pixel[1] = pixel[1] * (1.0 - dist);
+                pixel[2] = pixel[2] * (1.0 - dist);
+            }
+        }
+        if (int noise = dist(rng) < 3) {
+            for (int y = 0; y < frame.rows; ++y) {
+            for (int x = 0; x < frame.cols; ++x) {
+                double dx = static_cast<double>(x - frame.cols / 2) / (frame.cols / 2);
+                double dy = static_cast<double>(y - frame.rows / 2) / (frame.rows / 2);
+                double dist = sqrt(dx * dx + dy * dy)/2;
+
+                cv::Vec3b& pixel = frame.at<cv::Vec3b>(y, x);
+                pixel[0] = pixel[0] * (1.0 + dist);
+                pixel[1] = pixel[1] * (1.0 + dist);
+                pixel[2] = pixel[2] * (1.0 + dist);
+            }
+        }
+        }
+        for (int x = 0; x< frame.cols; ++x) {
+            if (dist(rng) < 3) {
+                for (int y = 0; y < frame.rows; ++y) {
+                    cv::Vec3b& pixel = frame.at<cv::Vec3b>(y, x);
+                    pixel[0] = 0;
+                    pixel[1] = 0;
+                    pixel[2] = 0;
+                }
+            }
+        }
+        
+    }
+    
+};
+
+class PolygonizeFilter {
+public:
+    void applyFilter(cv::Mat& frame) {
+        int blockSize = 10; // Taille des blocs de pixels à regrouper ensemble
+
+        for (int y = 0; y < frame.rows; y += blockSize) {
+            for (int x = 0; x < frame.cols; x += blockSize) {
+                cv::Vec3f averageColor = calculateAverageColor(frame, x, y, blockSize);
+                fillBlock(frame, x, y, blockSize, averageColor);
+            }
+        }
+    }
+
+    cv::Vec3f calculateAverageColor(const cv::Mat& frame, int startX, int startY, int blockSize) {
+        cv::Vec3f sumColor(0, 0, 0);
+        int count = 0;
+
+        for (int y = startY; y < startY + blockSize && y < frame.rows; ++y) {
+            for (int x = startX; x < startX + blockSize && x < frame.cols; ++x) {
+                sumColor += frame.at<cv::Vec3b>(y, x);
+                ++count;
+            }
+        }
+
+        return sumColor / count;
+    }
+
+    void fillBlock(cv::Mat& frame, int startX, int startY, int blockSize, const cv::Vec3f& color) {
+        for (int y = startY; y < startY + blockSize && y < frame.rows; ++y) {
+            for (int x = startX; x < startX + blockSize && x < frame.cols; ++x) {
+                frame.at<cv::Vec3b>(y, x) = color;
+            }
+        }
+    }
+};
     
 
 

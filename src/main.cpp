@@ -32,11 +32,9 @@ enum Filter {
     DISTORTION,
     NOISE,
     WATER,
-    FIRE
-    //cinema
-    //histo
-    
-    //polygoniser
+    FIRE,
+    CINEMA,
+    POLYGON
 };
 
 Filter currentFilter = Filter::NONE;
@@ -57,7 +55,8 @@ int main(int argc, char** argv) {
     BrokenGlassFilter glass = BrokenGlassFilter(140, 640, 480);
     BubbleFilter bubbleFilter(640);
     FireFilter firefilter(640, 480);
-
+    OldFilmFilter oldfilmfilter = OldFilmFilter();
+    PolygonizeFilter poly;
     double time = 0.0;
     
     // Initialise OpenCV et SDL
@@ -113,6 +112,8 @@ int main(int argc, char** argv) {
                 case SDLK_f: currentFilter = Filter::NOISE; break;
                 case SDLK_g: currentFilter = Filter::WATER; break;
                 case SDLK_h: currentFilter = Filter::FIRE; break;
+                case SDLK_i: currentFilter = Filter::CINEMA; break;
+                case SDLK_j: currentFilter = Filter::POLYGON; break;
             }
         }
     }
@@ -186,6 +187,14 @@ int main(int argc, char** argv) {
         }
         case Filter::FIRE: {
             firefilter.applyFilter(frame,time);
+            break;
+        }
+        case Filter::CINEMA: {
+            oldfilmfilter.applyFilter(frame,time);
+            break;
+        }
+        case Filter::POLYGON: {
+            poly.applyFilter(frame);
             break;
         }
     }
