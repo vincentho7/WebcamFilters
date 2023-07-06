@@ -2,7 +2,7 @@
 #define GRAY_SCALE_H
 #include <opencv2/opencv.hpp>
 
-void applyGrayscale(cv::Mat& frame) {
+inline void applyGrayscale(cv::Mat& frame) {
     for (int y = 0; y < frame.rows; ++y) {
         for (int x = 0; x < frame.cols; ++x) {
             cv::Vec3b& color = frame.at<cv::Vec3b>(y, x);
