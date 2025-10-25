@@ -2,11 +2,13 @@
 
 Creation of a C++ application for a catalog of visual filters applied in real time to a video stream from a webcam (smartphone or PC), with the aim of exploring fundamental image processing techniques. 
 Tasks
-Development of filters in C++, combining various approaches: 
-• edge detection (Sobel, Canny),
-• noise, blur, dithering effects, color manipulation, inversion, etc.
-• Real-time video capture and frame-by-frame filter application.
-• Interactive filter change management via a simple interface (keyboard or menu)
+
+Development of filters in C++, combining various approaches:
+
+- edge detection (Sobel, Canny),
+- noise, blur, dithering effects, color manipulation, inversion, etc.
+- Real-time video capture and frame-by-frame filter application.
+- Interactive filter change management via a simple interface (keyboard or menu)
 
 List : 
 - old cinema
