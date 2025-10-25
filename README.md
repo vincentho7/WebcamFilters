@@ -1,6 +1,6 @@
 # Real time filter project from 2023
 
-Creation of a C++ application for a catalog of visual filters applied in real time to a video stream from a webcam (smartphone or PC), with the aim of exploring fundamental image processing techniques. 
+A C++ application for a catalog of visual filters applied in real time to a video stream from a webcam (smartphone or PC), with the aim of exploring fundamental image processing techniques. 
 
 Development of filters in C++, combining various approaches:
 
